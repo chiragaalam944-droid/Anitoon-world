@@ -801,18 +801,18 @@ export async function loadStream(opts: {
       servers.push({
         id: "videasy-hindi",
         name: "Hindi Dub",
-        url: `https://player.videasy.to/anime/${anilistId}/${ep}?dub=hindi&color=e50914`,
+        url: `https://vidsrc.cc/v2/embed/anime/${anilistId}/${ep}?dub=hindi&color=e50914`,
       });
     }
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://player.videasy.to/anime/${anilistId}/${ep}?color=e50914`,
+      url: `https://vidsrc.cc/v2/embed/anime/${anilistId}/${ep}?color=e50914`,
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://player.videasy.to/anime/${anilistId}/${ep}?dub=true&color=e50914`,
+      url: `https://vidsrc.cc/v2/embed/anime/${anilistId}/${ep}?dub=true&color=e50914`,
     });
   }
 

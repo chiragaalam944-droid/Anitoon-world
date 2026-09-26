@@ -198,19 +198,19 @@ export function buildEmbedServers(
     servers.push({
       id: "videasy-hindi",
       name: "Hindi Dub",
-      url: `https://player.videasy.to/anime/${id}/${ep}?dub=hindi&color=e50914`,
+      url: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}?dub=hindi&color=e50914`,
     });
   }
   if (/^\d+$/.test(id)) {
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://player.videasy.to/anime/${id}/${ep}?color=e50914`,
+      url: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}?color=e50914`,
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://player.videasy.to/anime/${id}/${ep}?dub=true&color=e50914`,
+      url: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}?dub=true&color=e50914`,
     });
   }
   if (malId) {
