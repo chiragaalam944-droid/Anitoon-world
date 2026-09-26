@@ -198,19 +198,19 @@ export function buildEmbedServers(
     servers.push({
       id: "videasy-hindi",
       name: "Hindi Dub",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?dub=hindi&color=e50914`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
   }
   if (/^\d+$/.test(id)) {
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?color=e50914`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?dub=true&color=e50914`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
   }
   if (malId) {
@@ -218,33 +218,33 @@ export function buildEmbedServers(
       servers.push({
         id: "vidstream-hindi",
         name: "Vidstream · Hindi",
-        url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}/hindi`,
+        url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
       });
     }
     servers.push({
       id: "vidstream",
       name: "Vidstream",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
     servers.push({
       id: "vidstream-dub",
       name: "Vidstream · DUB",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}/dub`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
     servers.push({
       id: "streamwish",
       name: "StreamWish",
-      url: `https://vidsrc.vip/embed/anime?mal=${malId}&ep=${ep}`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
     servers.push({
       id: "vidsrc-tw",
       name: "Server 4",
-      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
     servers.push({
       id: "2embed",
       name: "2Embed",
-      url: `https://www.2embed.cc/embed/anime/${malId}/${ep}`,
+      url: `https://consumet-ten.vercel.app/anime/gogoanime/watch/
     });
   }
   return servers;
