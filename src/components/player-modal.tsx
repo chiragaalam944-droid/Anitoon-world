@@ -393,9 +393,18 @@ export function PlayerModal({
                     ? "bg-fg text-bg"
                     : "bg-surface-2 text-muted hover:text-fg",
                 )}
-              >
-                { {"vidstream":"HydraX","2embed":"MyCloud","streamwish":"VidCloud","server 4":"Vidmoly","sruby":"SRuby","neocdn":"NeoCDN"}[String(s.name || s.id).toLowerCase()] || s.name || s.id }
-              </button>
+              > {
+  (() => {
+    const v = String(s.name || s.id || "").toLowerCase();
+    if (v.includes("vidstream")) return "HydraX";
+    if (v.includes("2embed")) return "MyCloud";
+    if (v.includes("streamwish")) return "VidCloud";
+    if (v.includes("server 4") || v.includes("vidmoly")) return "Vidmoly";
+    if (v.includes("ruby")) return "SRuby";
+    if (v.includes("neo")) return "NeoCDN";
+    return s.name || s.id;
+  })()
+} </button>
             ))}
             <p className="w-full text-[11px] text-subtle sm:ml-auto sm:w-auto">
               If playback does not start, try another server.
