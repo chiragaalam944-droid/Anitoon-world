@@ -198,19 +198,19 @@ export function buildEmbedServers(
     servers.push({
       id: "videasy-hindi",
       name: "Hindi Dub",
-      url: `https://anitaku.pe/embed/${id}/${ep}?dub=hindi&color=e50914`,
+      url: `https://vidsrc.vip/embed/anime/${id}/${ep}?dub=hindi&color=e50914`,
     });
   }
   if (/^\d+$/.test(id)) {
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://anitaku.pe/embed/${id}/${ep}?color=e50914`,
+      url: `https://vidsrc.vip/embed/anime/${id}/${ep}?color=e50914`,
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://anitaku.pe/embed/${id}/${ep}?dub=true&color=e50914`,
+      url: `https://vidsrc.vip/embed/anime/${id}/${ep}?dub=true&color=e50914`,
     });
   }
   if (malId) {
@@ -218,28 +218,28 @@ export function buildEmbedServers(
       servers.push({
         id: "vidstream-hindi",
         name: "Vidstream · Hindi",
-        url: `https://anitaku.pe/embed/${malId}/${ep}/hindi`,
+        url: `https://vidsrc.vip/embed/anime/${malId}/${ep}/hindi`,
       });
     }
     servers.push({
       id: "vidstream",
       name: "Vidstream",
-      url: `https://anitaku.pe/embed/${malId}/${ep}`,
+      url: `https://vidsrc.vip/embed/anime/${malId}/${ep}`,
     });
     servers.push({
       id: "vidstream-dub",
       name: "Vidstream · DUB",
-      url: `https://anitaku.pe/embed/${malId}/${ep}/dub`,
+      url: `https://vidsrc.vip/embed/anime/${malId}/${ep}/dub`,
     });
     servers.push({
       id: "streamwish",
       name: "StreamWish",
-      url: `https://anitaku.pe/embed?mal=${malId}&ep=${ep}`,
+      url: `https://vidsrc.vip/embed/anime?mal=${malId}&ep=${ep}`,
     });
     servers.push({
       id: "vidsrc-tw",
       name: "Server 4",
-      url: `https://anitaku.pe/embed/${malId}/${ep}`,
+      url: `https://vidsrc.vip/embed/anime/${malId}/${ep}`,
     });
     servers.push({
       id: "2embed",
