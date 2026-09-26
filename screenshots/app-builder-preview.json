@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "AniToon World",
+      "hasCanvas": false,
+      "bodyTextLen": 2505,
+      "bodyTextHash": "32266b2145b0ad1d489a9e95c50ca7023312c0aeed3a730892ebf72cdc9c7935",
+      "bodyTextPrefix": "AniToon World ANIME & CARTOON HUB Search anime and cartoons Watc",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "AniToon World",
+      "hasCanvas": false,
+      "bodyTextLen": 2475,
+      "bodyTextHash": "732b2172766b0b54bce9a50bf4267ed852d1d6188d211f1b422b97c29ebe66f1",
+      "bodyTextPrefix": "AniToon World Search anime and cartoons ANITOON WORLD · TRENDING",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

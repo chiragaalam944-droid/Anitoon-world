@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Poster unavailable">
+  <rect width="400" height="600" fill="#121214"/>
+  <rect x="24" y="24" width="352" height="552" rx="18" fill="none" stroke="#2a2a30" stroke-width="2"/>
+  <circle cx="200" cy="268" r="46" fill="#1c1c21" stroke="#2a2a30"/>
+  <path d="M190 246v44l36-22z" fill="#e11d2e"/>
+  <text x="200" y="360" text-anchor="middle" fill="#6f6b66" font-family="Georgia, serif" font-size="22" letter-spacing="4">KAGE</text>
+</svg>

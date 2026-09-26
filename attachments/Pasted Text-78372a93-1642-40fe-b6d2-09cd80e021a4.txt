@@ -1,0 +1,33 @@
+Write a complete, single-file production-ready HTML, CSS, and JavaScript code for a modern Anime & Cartoon Streaming web application.
+
+1. Branding & UI Design:
+   - App Name: "AniToon World"
+   - Tagline: "AniToon World · Your Ultimate Anime & Cartoon Hub"
+   - Modern dark-mode UI (Netflix/Crunchyroll style) with a responsive grid layout, search bar, category filters, and modal video player.
+
+2. Safe Content Filter (PG / Family Friendly):
+   - Automatically filter out mature/adult anime from the homepage grid.
+   - Default homepage should display PG/Family-friendly cartoons and kids' anime (e.g., Doraemon, Pokémon, Naruto, Shin-chan). Mature content should never auto-load.
+
+3. Complete API Integration & Fallback Search:
+   - Use Consumet/Gogoanime API to auto-fetch anime catalog, thumbnails, and episode data.
+   - For search queries (especially "Doraemon" or popular cartoons), query multiple endpoints/fallbacks (e.g., Consumet, Kitsu/Jikan API) so ALL movies, specials, and seasons appear in the search results without missing any.
+
+4. Multi-Language Availability Badges:
+   - Display available audio/subtitle badges on anime cards and details popups (e.g., Hindi, English, Hinglish, Tamil, Telugu, Japanese, SUB/DUB).
+
+5. Infinite Scroll & Load More:
+   - Implement dynamic infinite scrolling or pagination so more anime cards keep loading automatically as the user scrolls down the page.
+
+6. Working Video Player & Auto-Next:
+   - Fix iframe/video player embedding so clicking "Play" on any episode streams cleanly inside the modal player.
+   - Add Auto-Next Episode functionality: when an episode finishes playing, automatically switch to and load the next episode.
+
+7. 48-Hour Ad Verification System (Monetization):
+   - When a user clicks "Play" or "Download" on any episode, check if an "ad_verified" token exists in LocalStorage and is less than 48 hours old.
+   - If NOT verified (or expired): Display a popup overlay saying "Please Skip Ad to Watch or Download" with a button ("Skip AD [V1] and Enjoy") that redirects users through a Shortener URL (e.g., https://2short.club/ or placeholder).
+   - Once verified, store a 48-hour timestamp in LocalStorage so the user gets ad-free direct access for the next 48 hours.
+
+8. History & Watchlist Management:
+   - Save watch history locally and include a visible "Clear History" button next to the watch history section.
+   - Add a "Continue Watching" row and "Add to Watchlist / Bookmark" buttons on anime cards.

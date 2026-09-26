@@ -1,0 +1,26 @@
+Please generate the complete, production-ready web application code with the following features, fixes, and premium UI styling:
+
+1. FIX GPLINKS URL ERROR (Monetization):
+   - Fix the "URL is invalid" error on the "Skip Ads" button click by properly encoding the target destination parameter.
+   - Construct the full API redirect URL as:
+     `https://api.gplinks.com/st?api=c73a19b90f7153ce05f2c8c2b24fe4b8c51e819f&url=` + encodeURIComponent(destinationUrl)
+   - Ensure `destinationUrl` defaults to the current page URL if empty or undefined.
+   - Enforce strict 48-hour localStorage verification logic so users cannot bypass the ad-wall by refreshing or hitting 'Back'.
+
+2. ADD HINDI DUB SUPPORT & LANGUAGE BADGES:
+   - Enable Hindi language support for anime titles that have Hindi Dubbing available (e.g., Demon Slayer, Jujutsu Kaisen, Solo Leveling, Naruto).
+   - Display dynamic badges on cards: "HINDI", "ENGLISH", "JAPANESE" (SUB/DUB).
+   - Add a "Hindi Dubbed" quick filter/category tab on the navigation bar.
+
+3. STREAMING & PLAYER FALLBACK FIX:
+   - Fix video streaming so episodes load instantly without getting stuck in infinite buffering.
+   - Provide automated fallbacks to working embed players (Vidstream / StreamWish) if the primary API stream fails.
+
+4. PREMIUM & MODERN UI DESIGN (Netflix / Crunchyroll Vibe):
+   - Design a dark, sleek Glassmorphism aesthetic (deep obsidian background `#0a0a0c`, subtle borders, glassy transparent header).
+   - Add smooth hover animations on poster cards (subtle scale-up, glowing neon outline on active focus).
+   - Implement a Hero Carousel / Featured Banner section at the top showcasing top-trending anime with high-res wallpapers and a prominent "Watch Now" button.
+   - Set "Trending" as the default homepage tab, keeping a strict 99% Anime / 1% Cartoons ratio (move Doraemon/Shinchan strictly to a "Kids/Cartoons" tab).
+
+5. STANDARD PAGINATION (No Infinite Scroll):
+   - Use clean, standard numbered pagination or a "Load More" button at the bottom of the grid instead of continuous infinite scroll.
