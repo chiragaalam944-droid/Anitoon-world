@@ -382,7 +382,7 @@ export function PlayerModal({
 
         {servers.length > 0 && episode ? (
           <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
-            {servers.map((s) => (
+            {servers.map((s) => { console.log("SERVER DATA:", s); return (
               <button
                 key={s.id}
                 type="button"
