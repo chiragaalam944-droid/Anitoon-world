@@ -394,7 +394,7 @@ export function PlayerModal({
                     : "bg-surface-2 text-muted hover:text-fg",
                 )}
               >
-                { {"Vidstream":"HydraX","VidStream":"HydraX","2Embed":"MyCloud","StreamWish":"VidCloud","Server 4":"Vidmoly"}[s.name] || s.name }
+                { {"vidstream":"HydraX","2embed":"MyCloud","streamwish":"VidCloud","server 4":"Vidmoly","sruby":"SRuby","neocdn":"NeoCDN"}[String(s.name || s.id).toLowerCase()] || s.name || s.id }
               </button>
             ))}
             <p className="w-full text-[11px] text-subtle sm:ml-auto sm:w-auto">
