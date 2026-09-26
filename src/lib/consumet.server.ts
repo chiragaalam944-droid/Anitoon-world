@@ -801,18 +801,18 @@ export async function loadStream(opts: {
       servers.push({
         id: "videasy-hindi",
         name: "Hindi Dub",
-        url: `https://www.vidsrc.pro/embed/anime/${anilistId}/${ep}?dub=hindi&color=e50914`,
+        url: `https://www.vidsrc.net/embed/anime/${anilistId}/${ep}?dub=hindi&color=e50914`,
       });
     }
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://www.vidsrc.pro/embed/anime/${anilistId}/${ep}?color=e50914`,
+      url: `https://www.vidsrc.net/embed/anime/${anilistId}/${ep}?color=e50914`,
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://www.vidsrc.pro/embed/anime/${anilistId}/${ep}?dub=true&color=e50914`,
+      url: `https://www.vidsrc.net/embed/anime/${anilistId}/${ep}?dub=true&color=e50914`,
     });
   }
 
@@ -820,19 +820,19 @@ export async function loadStream(opts: {
     servers.push({
       id: "vidstream",
       name: "Vidstream",
-      url: `https://embed.su/embed/anime/${mal}/${ep}`,
+      url: `https://vidsrc.net/embed/anime/${mal}/${ep}`,
     });
     if (opts.title && hasHindiDub(opts.title)) {
       servers.push({
         id: "vidstream-hindi",
         name: "Vidstream · Hindi",
-        url: `https://embed.su/embed/anime/${mal}/${ep}/hindi`,
+        url: `https://vidsrc.net/embed/anime/${mal}/${ep}/hindi`,
       });
     }
     servers.push({
       id: "vidstream-dub",
       name: "Vidstream · DUB",
-      url: `https://embed.su/embed/anime/${mal}/${ep}/dub`,
+      url: `https://vidsrc.net/embed/anime/${mal}/${ep}/dub`,
     });
     servers.push({
       id: "streamwish",
