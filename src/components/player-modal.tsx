@@ -330,11 +330,16 @@ export function PlayerModal({
                     <button
                       type="button"
                       className="flex h-12 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-accent-fg transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
-                      onClick={() => requestPlay(startEpisode || 1)}
-                    >
-                      <Play className="ml-0.5 size-4 fill-current" />
-                      Play episode {startEpisode || 1}
-                    </button>
+                      onClick={() =>{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
                     <p className="text-xs text-muted">Choose an episode below to start</p>
                   </>
                 )}
@@ -351,21 +356,29 @@ export function PlayerModal({
                 <button
                   type="button"
                   className="h-10 rounded-full bg-surface-2 px-3 text-xs font-medium text-muted"
-                  onClick={() => setNextCountdown(null)}
-                >
-                  Cancel
-                </button>
+                  onClick={() =>{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
                 <button
                   type="button"
                   className="inline-flex h-10 items-center gap-1 rounded-full bg-accent px-3 text-xs font-medium text-accent-fg"
-                  onClick={() => {
-                    setNextCountdown(null);
-                    goNext();
-                  }}
-                >
-                  <SkipForward className="size-3.5" />
-                  Play now
-                </button>
+                  onClick={() =>{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
               </div>
             </div>
           ) : null}
@@ -375,9 +388,16 @@ export function PlayerModal({
             aria-label="Close player"
             onClick={onClose}
             className="absolute top-3 right-3 z-10 flex size-10 items-center justify-center rounded-full bg-bg/80 text-fg backdrop-blur-sm transition-opacity duration-150 hover:opacity-90"
-          >
-            <X className="size-5" />
-          </button>
+          >{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
 
           {showAd ? (
             <AdGate
@@ -400,25 +420,16 @@ export function PlayerModal({
               <button
                 key={s.id}
                 type="button"
-                onClick={() => setServerId(s.id)}
-                className={cn(
-                  "h-9 rounded-full px-3 text-xs font-medium transition-colors duration-150",
-                  s.id === activeServer?.id
-                    ? "bg-fg text-bg"
-                    : "bg-surface-2 text-muted hover:text-fg",
-                )}
-              > {
-  (() => {
-    const v = String(s.name || s.id || "").toLowerCase();
-    if (v.includes("vidstream")) return "HydraX";
-    if (v.includes("2embed")) return "MyCloud";
-    if (v.includes("streamwish")) return "VidCloud";
-    if (v.includes("server 4") || v.includes("vidmoly")) return "Vidmoly";
-    if (v.includes("ruby")) return "SRuby";
-    if (v.includes("neo")) return "NeoCDN";
-    return s.name || s.id;
-  })()
-} </button>
+                onClick={() =>{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
             ))}
             <p className="w-full text-[11px] text-subtle sm:ml-auto sm:w-auto">
               If playback does not start, try another server.
@@ -453,18 +464,30 @@ export function PlayerModal({
                   "inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors duration-150",
                   saved ? "bg-surface-2 text-fg shadow-border" : "bg-fg text-bg hover:opacity-90",
                 )}
-              >
-                {saved ? <BookmarkCheck className="size-4" /> : <Bookmark className="size-4" />}
-                {saved ? "In watchlist" : "Watchlist"}
-              </button>
+              >{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
               <button
                 type="button"
                 onClick={onDownload}
                 className="inline-flex h-11 items-center gap-2 rounded-full bg-surface-2 px-4 text-sm font-medium text-fg shadow-border hover:shadow-border-hover"
-              >
-                <Download className="size-4" />
-                Download
-              </button>
+              >{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
             </div>
           </div>
 
@@ -492,19 +515,29 @@ export function PlayerModal({
                 onClick={goPrev}
                 disabled={!episode || episode <= (episodes[0]?.number ?? 1)}
                 className="inline-flex h-11 items-center gap-1 rounded-full bg-surface-2 px-3 text-sm font-medium text-fg disabled:opacity-40"
-              >
-                <ChevronLeft className="size-4" />
-                Prev
-              </button>
+              >{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
               <button
                 type="button"
                 onClick={goNext}
-                disabled={!episode || episode >= maxEp}
-                className="inline-flex h-11 items-center gap-1 rounded-full bg-surface-2 px-3 text-sm font-medium text-fg disabled:opacity-40"
-              >
-                Next
-                <ChevronRight className="size-4" />
-              </button>
+                disabled={!episode || episode >{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
             </div>
             <label className="inline-flex h-11 items-center gap-2 text-sm text-muted">
               <input
@@ -535,17 +568,16 @@ export function PlayerModal({
                   <button
                     key={ep.id}
                     type="button"
-                    onClick={() => requestPlay(ep.number)}
-                    className={cn(
-                      "h-10 rounded-md text-sm tabular-nums transition-colors duration-150",
-                      episode === ep.number
-                        ? "bg-accent text-accent-fg"
-                        : "bg-surface-2 text-fg hover:bg-border",
-                    )}
-                    title={ep.title}
-                  >
-                    {ep.number}
-                  </button>
+                    onClick={() =>{ (() => {
+      const txt = JSON.stringify(s).toLowerCase();
+      if (txt.includes("vidstream")) return "HydraX";
+      if (txt.includes("2embed")) return "MyCloud";
+      if (txt.includes("streamwish")) return "VidCloud";
+      if (txt.includes("server 4") || txt.includes("vidmoly")) return "Vidmoly";
+      if (txt.includes("ruby")) return "SRuby";
+      if (txt.includes("neo")) return "NeoCDN";
+      return s.name || s.id || "Server";
+    })() }</button>
                 ))}
               </div>
             )}
