@@ -198,19 +198,19 @@ export function buildEmbedServers(
     servers.push({
       id: "videasy-hindi",
       name: "Hindi Dub",
-      url: `https://player.smashy.stream/anime/${id}/${ep}?dub=hindi&color=e50914`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?dub=hindi&color=e50914`,
     });
   }
   if (/^\d+$/.test(id)) {
     servers.push({
       id: "videasy-sub",
       name: "Japanese SUB",
-      url: `https://player.smashy.stream/anime/${id}/${ep}?color=e50914`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?color=e50914`,
     });
     servers.push({
       id: "videasy-dub",
       name: "English Dub",
-      url: `https://player.smashy.stream/anime/${id}/${ep}?dub=true&color=e50914`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${id}/${ep}?dub=true&color=e50914`,
     });
   }
   if (malId) {
@@ -218,18 +218,18 @@ export function buildEmbedServers(
       servers.push({
         id: "vidstream-hindi",
         name: "Vidstream · Hindi",
-        url: `https://player.smashy.stream/anime/${malId}/${ep}/hindi`,
+        url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}/hindi`,
       });
     }
     servers.push({
       id: "vidstream",
       name: "Vidstream",
-      url: `https://player.smashy.stream/anime/${malId}/${ep}`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}`,
     });
     servers.push({
       id: "vidstream-dub",
       name: "Vidstream · DUB",
-      url: `https://player.smashy.stream/anime/${malId}/${ep}/dub`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}/dub`,
     });
     servers.push({
       id: "streamwish",
@@ -239,7 +239,7 @@ export function buildEmbedServers(
     servers.push({
       id: "vidsrc-tw",
       name: "Server 4",
-      url: `https://player.smashy.stream/anime/${malId}/${ep}`,
+      url: `https://consumet-api-clone.vercel.app/anime/gogoanime/watch/${malId}/${ep}`,
     });
     servers.push({
       id: "2embed",
