@@ -62,6 +62,20 @@ export function PlayerModal({
   );
   const [pendingEpisode, setPendingEpisode] = useState<number | null>(startEpisode ?? 1);
   const [showAd, setShowAd] = useState(false);
+  const relabelServers = (list) => {
+    if (!Array.isArray(list)) return list;
+    return list.map(s => {
+      const name = String(s.name || s.id || "").toLowerCase();
+      let newName = s.name || s.id;
+      if (name.includes("vidstream")) newName = "HydraX";
+      else if (name.includes("2embed")) newName = "MyCloud";
+      else if (name.includes("streamwish")) newName = "VidCloud";
+      else if (name.includes("server 4") || name.includes("vidmoly")) newName = "Vidmoly";
+      else if (name.includes("ruby")) newName = "SRuby";
+      else if (name.includes("neo")) newName = "NeoCDN";
+      return { ...s, name: newName, label: newName };
+    });
+  };
   const [servers, setServers] = useState<StreamServer[]>([]);
   const [serverId, setServerId] = useState<string | null>(null);
   const [loadingStream, setLoadingStream] = useState(false);
