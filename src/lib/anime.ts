@@ -218,18 +218,18 @@ export function buildEmbedServers(
       servers.push({
         id: "vidstream-hindi",
         name: "Vidstream · Hindi",
-        url: `https://vidsrc.pm/embed/anime/${malId}/${ep}/hindi`,
+        url: `https://embed.su/embed/anime/${malId}/${ep}/hindi`,
       });
     }
     servers.push({
       id: "vidstream",
       name: "Vidstream",
-      url: `https://vidsrc.pm/embed/anime/${malId}/${ep}`,
+      url: `https://embed.su/embed/anime/${malId}/${ep}`,
     });
     servers.push({
       id: "vidstream-dub",
       name: "Vidstream · DUB",
-      url: `https://vidsrc.pm/embed/anime/${malId}/${ep}/dub`,
+      url: `https://embed.su/embed/anime/${malId}/${ep}/dub`,
     });
     servers.push({
       id: "streamwish",
