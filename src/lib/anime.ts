@@ -378,3 +378,4 @@ export function fetchStream(opts: {
   if (opts.title) params.set("title", opts.title);
   return api<StreamPayload>(`/api/stream?${params}`);
 }
+// Animedekho server sync
