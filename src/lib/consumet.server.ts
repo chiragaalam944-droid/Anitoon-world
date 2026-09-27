@@ -7,12 +7,7 @@ export const ANIME_SERVERS = [
   { name: "NeoCDN", url: "https://vidsrc.cc/v2/embed/anime/" },
 ];
 
-export async function loadStream(opts: {
-  aniListId?: string;
-  malId?: number;
-  episode?: number;
-  title?: string;
-}) {
+export async function loadStream(opts: any) {
   return {
     servers: [
       { id: "hydrax-1", name: "HydraX", url: "https://player.smashy.stream/anime/" },
@@ -21,4 +16,16 @@ export async function loadStream(opts: {
       { id: "mycloud-1", name: "MyCloud", url: "https://vidlink.pro/anime/" },
     ],
   };
+}
+
+export async function loadCatalog(opts?: any) {
+  return { results: [] };
+}
+
+export async function loadInfo(opts?: any) {
+  return { id: opts?.id || "", title: opts?.title || "" };
+}
+
+export async function loadSearch(query?: any) {
+  return { results: [] };
 }
