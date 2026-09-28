@@ -1,89 +1,95 @@
-import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { Bookmark, BookmarkCheck, Play } from "lucide-react";
-import { isInMyList, POSTER_FALLBACK, toggleMyList, type AnimeCard } from "@/lib/anime";
+import { Bookmark, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LangBadges } from "./lang-badges";
+import {
+  POSTER_FALLBACK,
+  isInMyList,
+  toggleMyList,
+  type AnimeCard,
+} from "@/lib/anime";
 
-type PosterCardProps = {
+interface PosterCardProps {
   anime: AnimeCard;
-  onOpen: (anime: AnimeCard) => void;
+  onOpen: (anime: AnimeCard, episode?: number) => void;
   onListChange?: () => void;
   index?: number;
-};
+}
 
-export function PosterCard({ anime, onOpen, onListChange, index = 0 }: PosterCardProps) {
-  const [saved, setSaved] = useState(false);
+export function PosterCard({
+  anime,
+  onOpen,
+  onListChange,
+}: PosterCardProps) {
+  const saved = isInMyList(anime.id);
 
-  useEffect(() => {
-    setSaved(isInMyList(anime.id));
-  }, [anime.id]);
-
-  function onBookmark(e: MouseEvent | KeyboardEvent) {
-    e.stopPropagation();
+  const handleCardClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    toggleMyList({
-      id: anime.id,
-      malId: anime.malId,
-      title: anime.title,
-      image: anime.image,
-    });
-    setSaved(isInMyList(anime.id));
-    onListChange?.();
-  }
+    e.stopPropagation();
+    onOpen(anime, 1);
+  };
+
+  const handleBookmarkClick = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMyList(anime);
+    if (onListChange) onListChange();
+  };
 
   return (
     <div
-      className={cn(
-        "group atw-rise relative aspect-poster w-full overflow-hidden rounded-md bg-surface text-left",
-        "shadow-border transition-[transform,box-shadow] duration-200 ease-smooth-out",
-        "hover:z-10 hover:scale-[1.04] hover:shadow-neon",
-        "focus-within:shadow-neon",
-      )}
-      style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
+      onClick={handleCardClick}
+      className="group relative cursor-pointer overflow-hidden rounded-lg bg-surface shadow-border transition-all duration-200 active:scale-95 touch-manipulation"
     >
-      <button
-        type="button"
-        onClick={() => onOpen(anime)}
-        className="absolute inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
-      >
+      <div className="relative aspect-poster w-full overflow-hidden bg-surface-2">
         <img
           src={anime.image || POSTER_FALLBACK}
-          alt=""
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-200 ease-smooth-out group-hover:scale-[1.04]"
+          alt={anime.title}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             e.currentTarget.src = POSTER_FALLBACK;
           }}
         />
-        <span className="pointer-events-none absolute inset-0 poster-veil opacity-90" />
-        <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-250 group-hover:opacity-100">
-          <span className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg">
-            <Play className="ml-0.5 size-5 fill-current" />
+
+        {/* Overlay Play Icon */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <div className="flex size-12 items-center justify-center rounded-full bg-brand text-brand-fg shadow-lg">
+            <Play className="ml-0.5 size-6 fill-current" />
+          </div>
+        </div>
+
+        {/* Language Badges */}
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+          <span className="rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+            SUB / DUB
           </span>
-        </span>
-        {anime.rating ? (
-          <span className="absolute top-2 right-2 rounded-full bg-bg/80 px-2 py-0.5 text-[11px] font-medium tabular-nums text-fg backdrop-blur-sm">
-            {anime.rating > 10 ? (anime.rating / 10).toFixed(1) : anime.rating}
-          </span>
-        ) : null}
-        <span className="absolute inset-x-0 bottom-0 p-2.5 text-left">
-          <LangBadges badges={anime.languages} compact />
-          <span className="mt-1.5 line-clamp-2 block font-medium text-sm leading-snug text-fg">
-            {anime.title}
-          </span>
-          {anime.releaseDate ? (
-            <span className="mt-0.5 block text-[11px] text-muted">{anime.releaseDate}</span>
+          {anime.isHindi ? (
+            <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold text-brand-fg shadow">
+              HINDI
+            </span>
           ) : null}
-        </span>
-      </button>
-      <button
-        type="button"
-        aria-label={saved ? "Remove from watchlist" : "Add to watchlist"}
-        onClick={onBookmark}
-        className="absolute top-2 left-2 z-10 flex size-11 items-center justify-center rounded-full bg-bg/80 text-fg backdrop-blur-sm hover:bg-bg"
-      >
-        {saved ? <BookmarkCheck className="size-4" /> : <Bookmark className="size-4" />}
-      </button>
+        </div>
+
+        {/* Bookmark Button */}
+        <button
+          type="button"
+          onClick={handleBookmarkClick}
+          className={cn(
+            "absolute top-2 right-2 flex size-8 items-center justify-center rounded-full backdrop-blur-md transition-colors",
+            saved
+              ? "bg-brand text-brand-fg"
+              : "bg-black/60 text-white hover:bg-black/80"
+          )}
+          aria-label="Bookmark"
+        >
+          <Bookmark className="size-4 fill-current" />
+        </button>
+
+        {/* Bottom Title Gradient */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-6">
+          <p className="line-clamp-2 text-xs font-semibold text-white drop-shadow">
+            {anime.title}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
