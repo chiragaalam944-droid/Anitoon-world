@@ -4,6 +4,7 @@ export interface AnimeCard {
   title: string;
   image: string;
   episode?: number;
+  isHindi?: boolean;
 }
 
 export interface WatchEntry {
@@ -30,30 +31,36 @@ export const CATEGORIES = [
 export const POSTER_FALLBACK =
   "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80";
 
+const HINDI_ANIME_IDS = [21, 52034, 38000, 40748, 20, 16498, 5114];
+
 const FALLBACK_CATALOG: AnimeCard[] = [
   {
     id: "52034",
     malId: 52034,
     title: "Solo Leveling",
     image: "https://cdn.myanimelist.net/images/anime/1825/140733.jpg",
+    isHindi: true,
   },
   {
     id: "21",
     malId: 21,
     title: "One Piece",
     image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
+    isHindi: true,
   },
   {
     id: "38000",
     malId: 38000,
     title: "Demon Slayer: Kimetsu no Yaiba",
     image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg",
+    isHindi: true,
   },
   {
     id: "40748",
     malId: 40748,
     title: "Jujutsu Kaisen",
     image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
+    isHindi: true,
   },
 ];
 
@@ -75,12 +82,19 @@ export async function fetchCatalog(kind?: string, genre?: string, page: number =
     if (res.ok) {
       const data = await res.json();
       if (data?.data?.length > 0) {
-        const results: AnimeCard[] = data.data.map((anime: any) => ({
+        let results: AnimeCard[] = data.data.map((anime: any) => ({
           id: String(anime.mal_id),
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || POSTER_FALLBACK,
+          isHindi: HINDI_ANIME_IDS.includes(anime.mal_id),
         }));
+
+        if (genre === "hindi-dubbed" || kind === "hindi-dubbed") {
+          const hindiFiltered = results.filter((item) => item.isHindi);
+          results = hindiFiltered.length > 0 ? hindiFiltered : FALLBACK_CATALOG;
+        }
+
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
     }
@@ -101,6 +115,7 @@ export async function fetchSearch(query: string, page: number = 1) {
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.image_url || POSTER_FALLBACK,
+          isHindi: HINDI_ANIME_IDS.includes(anime.mal_id),
         }));
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
