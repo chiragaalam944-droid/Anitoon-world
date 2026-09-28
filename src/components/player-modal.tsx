@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Server, RefreshCw } from "lucide-react";
+import { X, Server, ExternalLink, RefreshCw } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -18,17 +18,15 @@ export function PlayerModal({
   const [serverIdx, setServerIdx] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
 
-  // Default fallback MAL ID if missing (e.g. 21 for One Piece)
   const malId = anime.malId || anime.id || "21";
 
-  // Fresh active providers extracted via Perplexity
   const SERVERS = [
     {
-      name: "MegaFlix (MAL)",
+      name: "MegaFlix",
       url: `https://megaflix.buzz/stream/mal/${malId}/${episode}/sub`,
     },
     {
-      name: "DropFile (Player)",
+      name: "DropFile",
       url: `https://dropfile.cc/player/tv/mal-${malId}/${episode}/1?audio=sub&lang=en`,
     },
     {
@@ -83,8 +81,8 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Video Player */}
-        <div className="relative flex-1 bg-black">
+        {/* Player Window */}
+        <div className="relative flex-1 bg-black flex flex-col items-center justify-center">
           <iframe
             key={`${serverIdx}-${episode}-${reloadKey}`}
             src={activeUrl}
@@ -92,8 +90,20 @@ export function PlayerModal({
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
             title={anime.title}
-            referrerPolicy="strict-origin-when-cross-origin"
           />
+          
+          {/* External Mirror Backup Banner */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 flex items-center gap-3">
+            <span className="text-xs text-gray-300 hidden sm:inline">If video shows blank:</span>
+            <a
+              href={activeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-bold text-brand hover:underline"
+            >
+              Open External Stream <ExternalLink className="size-3" />
+            </a>
+          </div>
         </div>
 
         {/* Controls */}
