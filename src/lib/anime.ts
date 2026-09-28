@@ -31,6 +31,9 @@ export const CATEGORIES = [
 export const POSTER_FALLBACK =
   "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80";
 
+// Standard popular Hindi dubbed anime IDs
+const HINDI_DUBBED_IDS = [21, 52034, 38000, 40748, 20, 16498, 5114, 223, 269, 1535];
+
 const FALLBACK_CATALOG: AnimeCard[] = [
   {
     id: "52034",
@@ -60,20 +63,6 @@ const FALLBACK_CATALOG: AnimeCard[] = [
     image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
     isHindi: true,
   },
-  {
-    id: "20",
-    malId: 20,
-    title: "Naruto",
-    image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg",
-    isHindi: true,
-  },
-  {
-    id: "16498",
-    malId: 16498,
-    title: "Attack on Titan",
-    image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
-    isHindi: true,
-  },
 ];
 
 const SERVER_NAME_MAP: Record<string, string> = {
@@ -94,13 +83,17 @@ export async function fetchCatalog(kind?: string, genre?: string, page: number =
     if (res.ok) {
       const data = await res.json();
       if (data?.data?.length > 0) {
-        const results: AnimeCard[] = data.data.map((anime: any) => ({
+        let results: AnimeCard[] = data.data.map((anime: any) => ({
           id: String(anime.mal_id),
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || POSTER_FALLBACK,
-          isHindi: true,
+          isHindi: HINDI_DUBBED_IDS.includes(anime.mal_id),
         }));
+
+        if (genre === "hindi-dubbed" || kind === "hindi-dubbed") {
+          results = results.map((item) => ({ ...item, isHindi: true }));
+        }
 
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
@@ -122,7 +115,7 @@ export async function fetchSearch(query: string, page: number = 1) {
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.image_url || POSTER_FALLBACK,
-          isHindi: true,
+          isHindi: HINDI_DUBBED_IDS.includes(anime.mal_id),
         }));
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
@@ -192,11 +185,11 @@ export function clearWatchHistory() {
 }
 
 export async function fetchStream(opts: any) {
+  const id = opts?.id || "21";
   const defaultServers = [
-    { id: "hydrax", name: "HydraX", url: "https://player.smashy.stream/anime/" },
-    { id: "vidcloud", name: "VidCloud", url: "https://vidsrc.cc/v2/embed/anime/" },
-    { id: "vidmoly", name: "Vidmoly", url: "https://player.smashy.stream/anime/" },
-    { id: "mycloud", name: "MyCloud", url: "https://vidlink.pro/anime/" },
+    { id: "vidsrc", name: "VidSrc (Primary)", url: `https://vidsrc.cc/v2/embed/anime/${id}` },
+    { id: "smashy", name: "SmashyStream", url: `https://player.smashy.stream/anime/${id}` },
+    { id: "vidlink", name: "VidLink", url: `https://vidlink.pro/anime/${id}` },
   ];
 
   return {
