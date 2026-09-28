@@ -26,11 +26,10 @@ export function PlayerModal({
   const [reloadKey, setReloadKey] = useState(0);
 
   const cleanSlug = toSlug(anime.title);
-  const malId = anime.malId || anime.id || "21";
-
-  // Direct Auto Embed Endpoints
-  const mainEmbedUrl = `https://vidsrc.me/embed/anime?id=${malId}&s=1&e=${episode}`;
-  const directWatchUrl = `https://gogoanimehd.io/${cleanSlug}-episode-${episode}`;
+  
+  // Working Direct Play + Fallback Direct AnimeDekho Link
+  const gogoStreamUrl = `https://anitaku.pe/${cleanSlug}-episode-${episode}`;
+  const embedUrl = `https://vidsrc.me/embed/anime?id=${anime.malId || anime.id}&s=1&e=${episode}`;
 
   useEffect(() => {
     try {
@@ -76,28 +75,28 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Video Frame */}
+        {/* Video Player */}
         <div className="relative flex-1 bg-black">
           <iframe
             key={`${episode}-${reloadKey}`}
-            src={mainEmbedUrl}
+            src={embedUrl}
             className="h-full w-full border-0"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allow="autoplay; encrypted-media; fullscreen"
             allowFullScreen
             title={anime.title}
           />
         </div>
 
-        {/* Controls */}
+        {/* Player Controls */}
         <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
           <div className="flex items-center justify-between text-xs">
             <a
-              href={directWatchUrl}
+              href={gogoStreamUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 rounded-full bg-brand/20 text-brand px-3 py-1 font-semibold hover:bg-brand/30 transition-colors"
             >
-              <ExternalLink className="size-3.5" /> Direct Player / Download
+              <ExternalLink className="size-3.5" /> Direct Player / Server
             </a>
 
             <button
