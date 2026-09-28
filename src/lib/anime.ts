@@ -1,174 +1,201 @@
-import { useState, useEffect } from "react";
-import { X, Play, Loader2 } from "lucide-react";
-import {
-  type AnimeCard,
-  fetchStream,
-  getWatchHistory,
-} from "@/lib/anime";
-
-interface PlayerModalProps {
-  anime: AnimeCard;
-  startEpisode?: number;
-  onClose: () => void;
-  onListChange?: () => void;
+export interface AnimeCard {
+  id: string;
+  malId?: number;
+  title: string;
+  image: string;
+  episode?: number;
+  isHindi?: boolean;
 }
 
-export function PlayerModal({
-  anime,
-  startEpisode = 1,
-  onClose,
-}: PlayerModalProps) {
-  const [episode, setEpisode] = useState(startEpisode);
-  const [servers, setServers] = useState<any[]>([]);
-  const [currentServer, setCurrentServer] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export interface WatchEntry {
+  id: string;
+  malId?: number;
+  title: string;
+  image: string;
+  episode?: number;
+  updatedAt?: number;
+}
 
-  useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
+export interface CatalogKind {
+  kind: string;
+  genre?: string;
+}
 
-    fetchStream({ id: anime.id, episode })
-      .then((res) => {
-        if (!isMounted) return;
-        const list = res?.servers || [];
-        setServers(list);
-        if (list.length > 0) setCurrentServer(list[0]);
-      })
-      .catch((err) => {
-        console.error("Stream error:", err);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
+export const CATEGORIES = [
+  { id: "trending", label: "Trending", kind: "trending" },
+  { id: "hindi-dubbed", label: "Hindi Dubbed", kind: "hindi-dubbed" },
+  { id: "popular", label: "Popular", kind: "popular" },
+  { id: "action", label: "Action", kind: "action" },
+] as const;
 
-    // Save to history
-    try {
-      const history = getWatchHistory();
-      const filtered = history.filter((item) => item.id !== anime.id);
-      const updated = [
-        {
-          id: anime.id,
-          malId: anime.malId,
-          title: anime.title,
-          image: anime.image,
-          episode,
-          updatedAt: Date.now(),
-        },
-        ...filtered,
-      ];
-      localStorage.setItem("anitoon_history", JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save history:", e);
+export const POSTER_FALLBACK =
+  "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80";
+
+// Standard popular Hindi dubbed anime IDs
+const HINDI_DUBBED_IDS = [21, 52034, 38000, 40748, 20, 16498, 5114, 223, 269, 1535];
+
+const FALLBACK_CATALOG: AnimeCard[] = [
+  {
+    id: "52034",
+    malId: 52034,
+    title: "Solo Leveling",
+    image: "https://cdn.myanimelist.net/images/anime/1825/140733.jpg",
+    isHindi: true,
+  },
+  {
+    id: "21",
+    malId: 21,
+    title: "One Piece",
+    image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
+    isHindi: true,
+  },
+  {
+    id: "38000",
+    malId: 38000,
+    title: "Demon Slayer: Kimetsu no Yaiba",
+    image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg",
+    isHindi: true,
+  },
+  {
+    id: "40748",
+    malId: 40748,
+    title: "Jujutsu Kaisen",
+    image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
+    isHindi: true,
+  },
+];
+
+const SERVER_NAME_MAP: Record<string, string> = {
+  "Hindi Dub": "HydraX (Hindi)",
+  "Japanese SUB": "HydraX (SUB)",
+  "English Dub": "HydraX (DUB)",
+  Vidstream: "HydraX",
+  "Vidstream Hindi": "VidCloud (Hindi)",
+  "Vidstream DUB": "VidCloud (DUB)",
+  StreamWish: "VidCloud",
+  "Server 4": "Vidmoly",
+  "2Embed": "MyCloud",
+};
+
+export async function fetchCatalog(kind?: string, genre?: string, page: number = 1) {
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.data?.length > 0) {
+        let results: AnimeCard[] = data.data.map((anime: any) => ({
+          id: String(anime.mal_id),
+          malId: anime.mal_id,
+          title: anime.title_english || anime.title,
+          image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || POSTER_FALLBACK,
+          isHindi: HINDI_DUBBED_IDS.includes(anime.mal_id),
+        }));
+
+        if (genre === "hindi-dubbed" || kind === "hindi-dubbed") {
+          results = results.map((item) => ({ ...item, isHindi: true }));
+        }
+
+        return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
+      }
     }
+  } catch (err) {
+    console.error("fetchCatalog error, fallback used:", err);
+  }
+  return { results: FALLBACK_CATALOG, hasNextPage: false };
+}
 
-    return () => {
-      isMounted = false;
-    };
-  }, [anime, episode]);
+export async function fetchSearch(query: string, page: number = 1) {
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${page}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.data?.length > 0) {
+        const results: AnimeCard[] = data.data.map((anime: any) => ({
+          id: String(anime.mal_id),
+          malId: anime.mal_id,
+          title: anime.title_english || anime.title,
+          image: anime.images?.jpg?.image_url || POSTER_FALLBACK,
+          isHindi: HINDI_DUBBED_IDS.includes(anime.mal_id),
+        }));
+        return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
+      }
+    }
+  } catch (err) {
+    console.error("fetchSearch error:", err);
+  }
+  return { results: FALLBACK_CATALOG, hasNextPage: false };
+}
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="relative flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-surface border border-border/50 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/50 px-4 py-3 bg-surface-2">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <Play className="size-5 shrink-0 text-brand fill-current" />
-            <h3 className="truncate font-display text-base font-semibold text-fg sm:text-lg">
-              {anime.title} - Episode {episode}
-            </h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-black/40 text-muted hover:bg-black/60 hover:text-fg transition-colors"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
+export function getWatchHistory(): WatchEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem("anitoon_history");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
 
-        {/* Video Player Frame */}
-        <div className="relative flex-1 bg-black">
-          {loading ? (
-            <div className="absolute inset-0 flex items-center justify-center text-muted">
-              <Loader2 className="size-8 animate-spin text-brand" />
-            </div>
-          ) : currentServer?.url ? (
-            <iframe
-              src={currentServer.url}
-              className="h-full w-full border-0"
-              allow="autoplay; encrypted-media; fullscreen"
-              allowFullScreen
-              title={anime.title}
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted">
-              <p>Player server unavailable.</p>
-              <button
-                type="button"
-                onClick={() => setEpisode(episode)}
-                className="rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-brand-fg"
-              >
-                Retry
-              </button>
-            </div>
-          )}
-        </div>
+export function getMyList(): WatchEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem("anitoon_mylist");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
 
-        {/* Controls / Servers / Episodes */}
-        <div className="flex flex-col gap-3 border-t border-border/50 p-4 bg-surface-2">
-          {/* Server selector */}
-          {servers.length > 0 ? (
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-xs font-semibold text-muted shrink-0">Server:</span>
-              {servers.map((srv) => (
-                <button
-                  key={srv.id}
-                  type="button"
-                  onClick={() => setCurrentServer(srv)}
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    currentServer?.id === srv.id
-                      ? "bg-brand text-brand-fg"
-                      : "bg-surface text-muted hover:text-fg"
-                  }`}
-                >
-                  {srv.name}
-                </button>
-              ))}
-            </div>
-          ) : null}
+export function isInMyList(id: string): boolean {
+  const list = getMyList();
+  return list.some((item) => item.id === id);
+}
 
-          {/* Episode Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-muted shrink-0">Episode:</span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={episode <= 1}
-                onClick={() => setEpisode((e) => Math.max(1, e - 1))}
-                className="rounded-full bg-surface px-3 py-1 text-xs text-muted disabled:opacity-40"
-              >
-                Prev Ep
-              </button>
-              <span className="text-xs font-bold text-fg self-center px-1">
-                {episode}
-              </span>
-              <button
-                type="button"
-                onClick={() => setEpisode((e) => e + 1)}
-                className="rounded-full bg-surface px-3 py-1 text-xs text-muted"
-              >
-                Next Ep
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+export function toggleMyList(anime: AnimeCard) {
+  if (typeof window === "undefined") return;
+  const list = getMyList();
+  const exists = list.some((item) => item.id === anime.id);
+  let updatedList: WatchEntry[];
+
+  if (exists) {
+    updatedList = list.filter((item) => item.id !== anime.id);
+  } else {
+    updatedList = [
+      {
+        id: anime.id,
+        malId: anime.malId,
+        title: anime.title,
+        image: anime.image,
+        updatedAt: Date.now(),
+      },
+      ...list,
+    ];
+  }
+
+  localStorage.setItem("anitoon_mylist", JSON.stringify(updatedList));
+}
+
+export function getContinueWatching(): WatchEntry[] {
+  return getWatchHistory();
+}
+
+export function clearWatchHistory() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("anitoon_history");
+}
+
+export async function fetchStream(opts: any) {
+  const id = opts?.id || "21";
+  const defaultServers = [
+    { id: "vidsrc", name: "VidSrc (Primary)", url: `https://vidsrc.cc/v2/embed/anime/${id}` },
+    { id: "smashy", name: "SmashyStream", url: `https://player.smashy.stream/anime/${id}` },
+    { id: "vidlink", name: "VidLink", url: `https://vidlink.pro/anime/${id}` },
+  ];
+
+  return {
+    servers: defaultServers.map((srv) => ({
+      ...srv,
+      name: SERVER_NAME_MAP[srv.name] || srv.name,
+    })),
+  };
 }
