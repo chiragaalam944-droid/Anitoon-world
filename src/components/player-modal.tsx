@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, RefreshCw, Server } from "lucide-react";
+import { X, Server } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -10,9 +10,31 @@ interface PlayerModalProps {
 }
 
 const SERVERS = [
-  { id: "vidsrc", name: "VidSrc", url: (id: string, ep: number) => `https://vidsrc.cc/v2/embed/anime/${id}/${ep}` },
-  { id: "smashy", name: "SmashyStream", url: (id: string, ep: number) => `https://player.smashy.stream/anime/${id}?ep=${ep}` },
-  { id: "vidlink", name: "VidLink", url: (id: string, ep: number) => `https://vidlink.pro/anime/${id}/${ep}` },
+  {
+    id: "hydrax",
+    name: "HydraX (Hindi/Sub)",
+    getUrl: (id: string, ep: number) => `https://vidsrc.cc/v2/embed/anime/${id}/${ep}`,
+  },
+  {
+    id: "vidcloud",
+    name: "VidCloud (Fast)",
+    getUrl: (id: string, ep: number) => `https://player.smashy.stream/anime/${id}?ep=${ep}`,
+  },
+  {
+    id: "streamtape",
+    name: "StreamTape",
+    getUrl: (id: string, ep: number) => `https://vidlink.pro/anime/${id}/${ep}`,
+  },
+  {
+    id: "vidmoly",
+    name: "Vidmoly (Backup)",
+    getUrl: (id: string, ep: number) => `https://vidsrc.me/embed/anime?id=${id}&season=1&episode=${ep}`,
+  },
+  {
+    id: "mycloud",
+    name: "MyCloud",
+    getUrl: (id: string, ep: number) => `https://2embed.org/embed/anime/${id}/${ep}`,
+  },
 ];
 
 export function PlayerModal({
@@ -22,7 +44,6 @@ export function PlayerModal({
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
   const [activeServer, setActiveServer] = useState(SERVERS[0]);
-  const [iframeKey, setIframeKey] = useState(0);
 
   const animeId = anime.malId || anime.id || "21";
 
@@ -47,10 +68,6 @@ export function PlayerModal({
     }
   }, [anime, episode]);
 
-  const reloadPlayer = () => {
-    setIframeKey((prev) => prev + 1);
-  };
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-2 sm:p-4 backdrop-blur-md"
@@ -62,11 +79,9 @@ export function PlayerModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/60 px-4 py-3 bg-surface-2">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <h3 className="truncate font-display text-sm font-semibold text-fg sm:text-base">
-              {anime.title} - Episode {episode}
-            </h3>
-          </div>
+          <h3 className="truncate font-display text-sm font-semibold text-fg sm:text-base">
+            {anime.title} - Episode {episode}
+          </h3>
           <button
             type="button"
             onClick={onClose}
@@ -79,8 +94,8 @@ export function PlayerModal({
         {/* Player Frame */}
         <div className="relative flex-1 bg-black">
           <iframe
-            key={`${activeServer.id}-${episode}-${iframeKey}`}
-            src={activeServer.url(String(animeId), episode)}
+            key={`${activeServer.id}-${episode}`}
+            src={activeServer.getUrl(String(animeId), episode)}
             className="h-full w-full border-0"
             allow="autoplay; encrypted-media; fullscreen"
             allowFullScreen
@@ -88,9 +103,9 @@ export function PlayerModal({
           />
         </div>
 
-        {/* Controls Bar */}
+        {/* Servers & Controls */}
         <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
-          {/* Servers Row */}
+          {/* Server Selector */}
           <div className="flex items-center gap-2 overflow-x-auto text-xs">
             <span className="flex items-center gap-1 font-semibold text-muted shrink-0">
               <Server className="size-3.5" /> Server:
@@ -109,17 +124,9 @@ export function PlayerModal({
                 {srv.name}
               </button>
             ))}
-            <button
-              type="button"
-              onClick={reloadPlayer}
-              className="ml-auto shrink-0 p-1 text-muted hover:text-fg"
-              title="Reload Player"
-            >
-              <RefreshCw className="size-3.5" />
-            </button>
           </div>
 
-          {/* Episode Navigation */}
+          {/* Episode Controls */}
           <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
             <span className="font-medium text-muted">Episode:</span>
             <div className="flex items-center gap-2">
