@@ -127,3 +127,4 @@ export async function fetchStream(opts: any) {
     })),
   };
       }
+export default AniToonApp;
