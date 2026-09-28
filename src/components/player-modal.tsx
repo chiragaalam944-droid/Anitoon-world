@@ -9,14 +9,6 @@ interface PlayerModalProps {
   onListChange?: () => void;
 }
 
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
-
 export function PlayerModal({
   anime,
   startEpisode = 1,
@@ -26,26 +18,22 @@ export function PlayerModal({
   const [serverIdx, setServerIdx] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const cleanSlug = toSlug(anime.title);
-  const animeId = anime.malId || anime.id || "21";
+  // Default fallback MAL ID if missing (e.g. 21 for One Piece)
+  const malId = anime.malId || anime.id || "21";
 
-  // VidSrc CC & Working Embed Templates from EmbedIn Repository
+  // Fresh active providers extracted via Perplexity
   const SERVERS = [
     {
-      name: "VidSrc CC (Anime)",
-      url: `https://vidsrc.cc/v2/embed/anime/${animeId}/${episode}?poster=true&autoPlay=true`,
+      name: "MegaFlix (MAL)",
+      url: `https://megaflix.buzz/stream/mal/${malId}/${episode}/sub`,
     },
     {
-      name: "VidSrc Pro",
-      url: `https://vidsrc.pro/embed/anime/${cleanSlug}/${episode}`,
+      name: "DropFile (Player)",
+      url: `https://dropfile.cc/player/tv/mal-${malId}/${episode}/1?audio=sub&lang=en`,
     },
     {
-      name: "VidSrc XYZ",
-      url: `https://vidsrc.xyz/embed/anime/${animeId}/${episode}`,
-    },
-    {
-      name: "2Embed Player",
-      url: `https://www.2embed.cc/embedanime/${animeId}?ep=${episode}`,
+      name: "VidSrc CC",
+      url: `https://vidsrc.cc/v2/embed/anime/${malId}/${episode}?poster=true&autoPlay=true`,
     },
   ];
 
@@ -104,6 +92,7 @@ export function PlayerModal({
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
             title={anime.title}
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         </div>
 
