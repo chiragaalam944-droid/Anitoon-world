@@ -9,31 +9,30 @@ interface PlayerModalProps {
   onListChange?: () => void;
 }
 
-const SERVERS = [
+const WORKING_SERVERS = [
   {
-    id: "hydrax",
-    name: "HydraX (Hindi/Sub)",
-    getUrl: (id: string, ep: number) => `https://vidsrc.cc/v2/embed/anime/${id}/${ep}`,
+    id: "autoembed",
+    name: "Server 1 (Fast Auto)",
+    getUrl: (id: string, ep: number) =>
+      `https://player.autoembed.cc/embed/anime/${id}/${ep}`,
   },
   {
-    id: "vidcloud",
-    name: "VidCloud (Fast)",
-    getUrl: (id: string, ep: number) => `https://player.smashy.stream/anime/${id}?ep=${ep}`,
+    id: "vidsrcpro",
+    name: "Server 2 (Hindi/Dub)",
+    getUrl: (id: string, ep: number) =>
+      `https://vidsrc.pro/embed/anime/${id}/${ep}`,
   },
   {
-    id: "streamtape",
-    name: "StreamTape",
-    getUrl: (id: string, ep: number) => `https://vidlink.pro/anime/${id}/${ep}`,
+    id: "2embed",
+    name: "Server 3 (AnimeDekho)",
+    getUrl: (id: string, ep: number) =>
+      `https://www.2embed.cc/embedanime/${id}?ep=${ep}`,
   },
   {
-    id: "vidmoly",
-    name: "Vidmoly (Backup)",
-    getUrl: (id: string, ep: number) => `https://vidsrc.me/embed/anime?id=${id}&season=1&episode=${ep}`,
-  },
-  {
-    id: "mycloud",
-    name: "MyCloud",
-    getUrl: (id: string, ep: number) => `https://2embed.org/embed/anime/${id}/${ep}`,
+    id: "animeplay",
+    name: "Server 4 (Backup)",
+    getUrl: (id: string, ep: number) =>
+      `https://anime.vidsrc.vip/embed/anime/${id}/${ep}`,
   },
 ];
 
@@ -43,7 +42,7 @@ export function PlayerModal({
   onClose,
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
-  const [activeServer, setActiveServer] = useState(SERVERS[0]);
+  const [activeServer, setActiveServer] = useState(WORKING_SERVERS[0]);
 
   const animeId = anime.malId || anime.id || "21";
 
@@ -70,7 +69,7 @@ export function PlayerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-2 sm:p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2 sm:p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
@@ -91,26 +90,26 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Player Frame */}
+        {/* Video Player Frame */}
         <div className="relative flex-1 bg-black">
           <iframe
             key={`${activeServer.id}-${episode}`}
             src={activeServer.getUrl(String(animeId), episode)}
             className="h-full w-full border-0"
-            allow="autoplay; encrypted-media; fullscreen"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
             title={anime.title}
           />
         </div>
 
-        {/* Servers & Controls */}
+        {/* Server Selection & Episodes */}
         <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
-          {/* Server Selector */}
+          {/* Servers */}
           <div className="flex items-center gap-2 overflow-x-auto text-xs">
             <span className="flex items-center gap-1 font-semibold text-muted shrink-0">
               <Server className="size-3.5" /> Server:
             </span>
-            {SERVERS.map((srv) => (
+            {WORKING_SERVERS.map((srv) => (
               <button
                 key={srv.id}
                 type="button"
