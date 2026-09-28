@@ -1,119 +1,173 @@
-"use client";
+import { useState, useEffect } from "react";
+import { X, Play, Loader2 } from "lucide-react";
+import {
+  type AnimeCard,
+  fetchStream,
+  getWatchHistory,
+} from "@/lib/anime";
 
-import { useEffect, useState } from "react";
-import { StreamServer, fetchStream } from "@/lib/anime";
-
-export interface PlayerModalProps {
-  isOpen: boolean;
+interface PlayerModalProps {
+  anime: AnimeCard;
+  startEpisode?: number;
   onClose: () => void;
-  animeId: string;
-  malId?: number;
-  episodeNumber: number;
-  animeTitle: string;
-}
-
-const SERVER_NAME_MAP: Record<string, string> = {
-  "Hindi Dub": "HydraX (Hindi)",
-  "Japanese SUB": "HydraX (SUB)",
-  "English Dub": "HydraX (DUB)",
-  Vidstream: "HydraX",
-  "Vidstream Hindi": "VidCloud (Hindi)",
-  "Vidstream DUB": "VidCloud (DUB)",
-  StreamWish: "VidCloud",
-  "Server 4": "Vidmoly",
-  "2Embed": "MyCloud",
-};
-
-function normalizeServer(server: StreamServer): StreamServer {
-  const cleanName = SERVER_NAME_MAP[server.name] || server.name;
-  return { ...server, name: cleanName };
+  onListChange?: () => void;
 }
 
 export function PlayerModal({
-  isOpen,
+  anime,
+  startEpisode = 1,
   onClose,
-  animeId,
-  malId,
-  episodeNumber,
-  animeTitle,
 }: PlayerModalProps) {
-  const [servers, setServers] = useState<StreamServer[]>([]);
-  const [activeServer, setActiveServer] = useState<StreamServer | null>(null);
+  const [episode, setEpisode] = useState(startEpisode);
+  const [servers, setServers] = useState<any[]>([]);
+  const [currentServer, setCurrentServer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isOpen) return;
+    let isMounted = true;
     setLoading(true);
 
-    fetchStream({
-      aniListId: animeId,
-      malId,
-      episode: episodeNumber,
-      title: animeTitle,
-    })
-      .then((data) => {
-        const cleaned = (data.servers || []).map(normalizeServer);
-        setServers(cleaned);
-        if (cleaned.length > 0) {
-          setActiveServer(cleaned[0]);
-        }
+    fetchStream({ id: anime.id, episode })
+      .then((res) => {
+        if (!isMounted) return;
+        const list = res?.servers || [];
+        setServers(list);
+        if (list.length > 0) setCurrentServer(list[0]);
       })
       .catch((err) => {
-        console.error("Failed to load servers", err);
+        console.error("Stream error:", err);
       })
       .finally(() => {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       });
-  }, [isOpen, animeId, malId, episodeNumber, animeTitle]);
 
-  if (!isOpen) return null;
+    // Save to history
+    try {
+      const history = getWatchHistory();
+      const filtered = history.filter((item) => item.id !== anime.id);
+      const updated = [
+        {
+          id: anime.id,
+          malId: anime.malId,
+          title: anime.title,
+          image: anime.image,
+          episode,
+          updatedAt: Date.now(),
+        },
+        ...filtered,
+      ];
+      localStorage.setItem("anitoon_history", JSON.stringify(updated));
+    } catch (e) {
+      console.error("Failed to save history:", e);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [anime, episode]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="relative w-full max-w-4xl rounded-xl bg-zinc-900 p-6 text-white shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-2xl font-bold text-zinc-400 hover:text-white"
-        >
-          ✕
-        </button>
-        <h2 className="mb-4 text-xl font-bold">
-          {animeTitle} - Episode {episodeNumber}
-        </h2>
-
-        {loading ? (
-          <div className="flex h-64 items-center justify-center">
-            <p className="animate-pulse text-zinc-400">Loading servers...</p>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-surface border border-border/50 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border/50 px-4 py-3 bg-surface-2">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Play className="size-5 shrink-0 text-brand fill-current" />
+            <h3 className="truncate font-display text-base font-semibold text-fg sm:text-lg">
+              {anime.title} - Episode {episode}
+            </h3>
           </div>
-        ) : (
-          <div>
-            {activeServer ? (
-              <iframe
-                src={activeServer.url}
-                className="h-96 w-full rounded-lg border border-zinc-800"
-                allowFullScreen
-              />
-            ) : (
-              <p className="text-red-400">No stream sources found.</p>
-            )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-black/40 text-muted hover:bg-black/60 hover:text-fg transition-colors"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {servers.map((srv, idx) => (
+        {/* Video Player Frame */}
+        <div className="relative flex-1 bg-black">
+          {loading ? (
+            <div className="absolute inset-0 flex items-center justify-center text-muted">
+              <Loader2 className="size-8 animate-spin text-brand" />
+            </div>
+          ) : currentServer?.url ? (
+            <iframe
+              src={currentServer.url}
+              className="h-full w-full border-0"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              title={anime.title}
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted">
+              <p>Player server unavailable.</p>
+              <button
+                type="button"
+                onClick={() => setEpisode(episode)}
+                className="rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-brand-fg"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Controls / Servers / Episodes */}
+        <div className="flex flex-col gap-3 border-t border-border/50 p-4 bg-surface-2">
+          {/* Server selector */}
+          {servers.length > 0 ? (
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <span className="text-xs font-semibold text-muted shrink-0">Server:</span>
+              {servers.map((srv) => (
                 <button
-                  key={srv.id || idx}
-                  onClick={() => setActiveServer(srv)}
-                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                    activeServer?.name === srv.name
-                      ? "bg-red-600 text-white"
-                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  key={srv.id}
+                  type="button"
+                  onClick={() => setCurrentServer(srv)}
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    currentServer?.id === srv.id
+                      ? "bg-brand text-brand-fg"
+                      : "bg-surface text-muted hover:text-fg"
                   }`}
                 >
                   {srv.name}
                 </button>
               ))}
             </div>
+          ) : null}
+
+          {/* Episode Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-muted shrink-0">Episode:</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={episode <= 1}
+                onClick={() => setEpisode((e) => Math.max(1, e - 1))}
+                className="rounded-full bg-surface px-3 py-1 text-xs text-muted disabled:opacity-40"
+              >
+                Prev Ep
+              </button>
+              <span className="text-xs font-bold text-fg self-center px-1">
+                {episode}
+              </span>
+              <button
+                type="button"
+                onClick={() => setEpisode((e) => e + 1)}
+                className="rounded-full bg-surface px-3 py-1 text-xs text-muted"
+              >
+                Next Ep
+              </button>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
