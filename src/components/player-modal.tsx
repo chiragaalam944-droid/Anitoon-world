@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { X, Server, RefreshCw, Film, AlertCircle } from "lucide-react";
-import Hls from "hls.js";
+import { useState, useEffect } from "react";
+import { X, Play, ExternalLink, Film, RefreshCw, Server } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -17,28 +16,25 @@ export function PlayerModal({
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
   const [serverIdx, setServerIdx] = useState(0);
-  const [playerError, setPlayerError] = useState("");
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
 
   const malId = anime.malId || anime.id || "21";
 
-  // Perplexity verified HLS / Embed servers
+  // Active High-Availability Mirrors
   const SERVERS = [
     {
-      name: "VidSrc HD Proxy",
-      type: "iframe",
+      name: "VidSrc Pro",
+      desc: "Fast Multi-Quality Player (MAL Route)",
       url: `https://vidsrc.pro/embed/anime/${malId}/${episode}`,
     },
     {
-      name: "AutoEmbed Stream",
-      type: "iframe",
-      url: `https://player.autoembed.cc/embed/anime/${malId}/${episode}`,
+      name: "2Embed Stream",
+      desc: "High-Speed Backup Stream Provider",
+      url: `https://www.2embed.cc/embedanime/${malId}/${episode}`,
     },
     {
-      name: "2Embed Mirror",
-      type: "iframe",
-      url: `https://www.2embed.cc/embedanime/${malId}/${episode}`,
+      name: "AutoEmbed",
+      desc: "Auto-Fallback Mirror",
+      url: `https://player.autoembed.cc/embed/anime/${malId}/${episode}`,
     },
   ];
 
@@ -67,11 +63,11 @@ export function PlayerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2 sm:p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-3 backdrop-blur-md"
       onClick={onClose}
     >
       <div
-        className="relative flex h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-surface border border-border/60 shadow-2xl"
+        className="relative flex w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-surface border border-border/60 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -79,7 +75,7 @@ export function PlayerModal({
           <div className="flex items-center gap-2 truncate">
             <Film className="size-4 text-brand shrink-0" />
             <h3 className="truncate font-display text-sm font-semibold text-fg sm:text-base">
-              {anime.title} - Episode {episode}
+              {anime.title}
             </h3>
           </div>
           <button
@@ -91,68 +87,73 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Video Player Display */}
-        <div className="relative flex-1 bg-black flex items-center justify-center">
-          <iframe
-            key={`${serverIdx}-${episode}`}
-            src={activeServer.url}
-            className="h-full w-full border-0"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowFullScreen
-            title={anime.title}
-          />
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
-          {/* Server Switcher */}
-          <div className="flex items-center gap-2 overflow-x-auto text-xs">
-            <span className="flex items-center gap-1 font-semibold text-muted shrink-0">
-              <Server className="size-3.5" /> Server:
+        {/* Server Launcher Interface */}
+        <div className="p-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-surface-2 to-surface gap-5">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand px-2.5 py-0.5 rounded-full bg-brand/10 border border-brand/20">
+              Episode {episode}
             </span>
-            {SERVERS.map((srv, idx) => (
-              <button
-                key={srv.name}
-                type="button"
-                onClick={() => {
-                  setServerIdx(idx);
-                  setPlayerError("");
-                }}
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                  serverIdx === idx
-                    ? "bg-brand text-brand-fg font-bold"
-                    : "bg-surface text-muted hover:text-fg"
-                }`}
-              >
-                {srv.name}
-              </button>
-            ))}
+            <h4 className="text-lg font-bold text-fg mt-2">{activeServer.name}</h4>
+            <p className="text-xs text-muted">{activeServer.desc}</p>
           </div>
 
-          {/* Episode Navigation */}
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
-            <span className="font-medium text-muted">Episode:</span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={episode <= 1}
-                onClick={() => setEpisode((e) => Math.max(1, e - 1))}
-                className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg disabled:opacity-30"
-              >
-                Prev Ep
-              </button>
-              <span className="font-bold text-fg px-1">{episode}</span>
-              <button
-                type="button"
-                onClick={() => setEpisode((e) => e + 1)}
-                className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg"
-              >
-                Next Ep
-              </button>
+          {/* Launch Button */}
+          <a
+            href={activeServer.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full max-w-xs py-3.5 px-6 rounded-xl bg-brand text-brand-fg font-bold text-sm flex items-center justify-center gap-2 shadow-lg hover:opacity-90 active:scale-95 transition-all"
+          >
+            <Play className="size-4 fill-current" /> Play Episode {episode} <ExternalLink className="size-4" />
+          </a>
+
+          {/* Server Switcher */}
+          <div className="w-full pt-4 border-t border-border/40">
+            <p className="text-xs font-medium text-muted mb-2 flex items-center justify-center gap-1">
+              <Server className="size-3.5" /> Switch Mirror Server:
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {SERVERS.map((srv, idx) => (
+                <button
+                  key={srv.name}
+                  type="button"
+                  onClick={() => setServerIdx(idx)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    serverIdx === idx
+                      ? "bg-brand/20 text-brand border border-brand/40 shadow-sm"
+                      : "bg-surface-2 text-muted hover:text-fg border border-border/40"
+                  }`}
+                >
+                  {srv.name}
+                </button>
+              ))}
             </div>
+          </div>
+        </div>
+
+        {/* Episode Navigation */}
+        <div className="flex items-center justify-between text-xs px-4 py-3 border-t border-border/60 bg-surface-2">
+          <span className="font-medium text-muted">Navigation:</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={episode <= 1}
+              onClick={() => setEpisode((e) => Math.max(1, e - 1))}
+              className="rounded-lg bg-surface px-3 py-1.5 text-xs font-semibold text-fg border border-border/40 disabled:opacity-30"
+            >
+              Prev Ep
+            </button>
+            <span className="font-bold text-fg px-2 text-sm">{episode}</span>
+            <button
+              type="button"
+              onClick={() => setEpisode((e) => e + 1)}
+              className="rounded-lg bg-surface px-3 py-1.5 text-xs font-semibold text-fg border border-border/40"
+            >
+              Next Ep
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-                }
+}
