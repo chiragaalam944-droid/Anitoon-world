@@ -21,14 +21,12 @@ export function PosterCard({
 }: PosterCardProps) {
   const saved = isInMyList(anime.id);
 
-  const handleCardClick = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const handleOpen = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     onOpen(anime, 1);
   };
 
-  const handleBookmarkClick = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const handleBookmark = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     toggleMyList(anime);
     if (onListChange) onListChange();
@@ -36,8 +34,13 @@ export function PosterCard({
 
   return (
     <div
-      onClick={handleCardClick}
-      className="group relative cursor-pointer overflow-hidden rounded-lg bg-surface shadow-border transition-all duration-200 active:scale-95 touch-manipulation"
+      role="button"
+      tabIndex={0}
+      onClick={handleOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") handleOpen(e);
+      }}
+      className="group relative cursor-pointer overflow-hidden rounded-lg bg-surface shadow-border transition-all duration-200 active:scale-95 touch-manipulation select-none"
     >
       <div className="relative aspect-poster w-full overflow-hidden bg-surface-2">
         <img
@@ -49,14 +52,14 @@ export function PosterCard({
           }}
         />
 
-        {/* Overlay Play Icon */}
+        {/* Hover Play Icon */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <div className="flex size-12 items-center justify-center rounded-full bg-brand text-brand-fg shadow-lg">
             <Play className="ml-0.5 size-6 fill-current" />
           </div>
         </div>
 
-        {/* Language Badges */}
+        {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-wrap gap-1">
           <span className="rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
             SUB / DUB
@@ -69,11 +72,15 @@ export function PosterCard({
         </div>
 
         {/* Bookmark Button */}
-        <button
-          type="button"
-          onClick={handleBookmarkClick}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={handleBookmark}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") handleBookmark(e);
+          }}
           className={cn(
-            "absolute top-2 right-2 flex size-8 items-center justify-center rounded-full backdrop-blur-md transition-colors",
+            "absolute top-2 right-2 flex size-8 items-center justify-center rounded-full backdrop-blur-md transition-colors z-10",
             saved
               ? "bg-brand text-brand-fg"
               : "bg-black/60 text-white hover:bg-black/80"
@@ -81,9 +88,9 @@ export function PosterCard({
           aria-label="Bookmark"
         >
           <Bookmark className="size-4 fill-current" />
-        </button>
+        </div>
 
-        {/* Bottom Title Gradient */}
+        {/* Title Overlay */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-6">
           <p className="line-clamp-2 text-xs font-semibold text-white drop-shadow">
             {anime.title}
