@@ -131,6 +131,35 @@ export function getMyList(): WatchEntry[] {
   }
 }
 
+export function isInMyList(id: string): boolean {
+  const list = getMyList();
+  return list.some((item) => item.id === id);
+}
+
+export function toggleMyList(anime: AnimeCard) {
+  if (typeof window === "undefined") return;
+  const list = getMyList();
+  const exists = list.some((item) => item.id === anime.id);
+  let updatedList: WatchEntry[];
+
+  if (exists) {
+    updatedList = list.filter((item) => item.id !== anime.id);
+  } else {
+    updatedList = [
+      {
+        id: anime.id,
+        malId: anime.malId,
+        title: anime.title,
+        image: anime.image,
+        updatedAt: Date.now(),
+      },
+      ...list,
+    ];
+  }
+
+  localStorage.setItem("anitoon_mylist", JSON.stringify(updatedList));
+}
+
 export function getContinueWatching(): WatchEntry[] {
   return getWatchHistory();
 }
