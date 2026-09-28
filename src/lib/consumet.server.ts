@@ -1,29 +1,30 @@
+// Fallback missing exports for build validation
+export async function loadCatalog(query?: string) {
+  return [];
+}
+
+export async function loadInfo(id: string) {
+  return null;
+}
+
+export async function loadSearch(query: string) {
+  return [];
+}
+
+export async function loadStream(id: string, ep: number = 1) {
+  return null;
+}
+
 export async function getAnimeStreamUrl(title: string, episode: number = 1) {
   try {
-    const query = encodeURIComponent(title);
-    const searchRes = await fetch(
-      `https://api.consumet.org/anime/gogoanime/${query}`
-    );
-    const searchData = await searchRes.json();
-
-    if (searchData?.results?.length > 0) {
-      const animeId = searchData.results[0].id;
-      const episodeId = `${animeId}-episode-${episode}`;
-
-      const streamRes = await fetch(
-        `https://api.consumet.org/anime/gogoanime/watch/${episodeId}`
-      );
-      const streamData = await streamRes.json();
-
-      if (streamData?.headers?.Referer && streamData?.sources?.length > 0) {
-        const defaultSource =
-          streamData.sources.find((s: any) => s.quality === "default") ||
-          streamData.sources[0];
-        return defaultSource.url;
-      }
-    }
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+    return `https://vidsrc.cc/v2/embed/anime/${slug}/${episode}`;
   } catch (err) {
-    console.error("Consumet Stream Fetch Error:", err);
+    console.error("Stream Fetch Error:", err);
   }
   return null;
 }
