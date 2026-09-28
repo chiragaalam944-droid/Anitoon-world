@@ -30,13 +30,7 @@ export const CATEGORIES = [
 export const POSTER_FALLBACK =
   "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80";
 
-const DEFAULT_ANIME_LIST: AnimeCard[] = [
-  {
-    id: "21",
-    malId: 21,
-    title: "One Piece",
-    image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
-  },
+const FALLBACK_CATALOG: AnimeCard[] = [
   {
     id: "52034",
     malId: 52034,
@@ -44,10 +38,10 @@ const DEFAULT_ANIME_LIST: AnimeCard[] = [
     image: "https://cdn.myanimelist.net/images/anime/1825/140733.jpg",
   },
   {
-    id: "5114",
-    malId: 5114,
-    title: "Fullmetal Alchemist: Brotherhood",
-    image: "https://cdn.myanimelist.net/images/anime/1208/94745.jpg",
+    id: "21",
+    malId: 21,
+    title: "One Piece",
+    image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
   },
   {
     id: "38000",
@@ -60,18 +54,6 @@ const DEFAULT_ANIME_LIST: AnimeCard[] = [
     malId: 40748,
     title: "Jujutsu Kaisen",
     image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
-  },
-  {
-    id: "16498",
-    malId: 16498,
-    title: "Attack on Titan",
-    image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
-  },
-  {
-    id: "20",
-    malId: 20,
-    title: "Naruto",
-    image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg",
   },
 ];
 
@@ -92,61 +74,41 @@ export async function fetchCatalog(kind?: string, genre?: string, page: number =
     const res = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}`);
     if (res.ok) {
       const data = await res.json();
-      if (data.data && data.data.length > 0) {
+      if (data?.data?.length > 0) {
         const results: AnimeCard[] = data.data.map((anime: any) => ({
           id: String(anime.mal_id),
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || POSTER_FALLBACK,
         }));
-        return {
-          results,
-          hasNextPage: Boolean(data.pagination?.has_next_page),
-        };
+        return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
     }
   } catch (err) {
-    console.error("Fetch catalog fallback activated:", err);
+    console.error("fetchCatalog error, fallback used:", err);
   }
-
-  return {
-    results: DEFAULT_ANIME_LIST,
-    hasNextPage: false,
-  };
+  return { results: FALLBACK_CATALOG, hasNextPage: false };
 }
 
 export async function fetchSearch(query: string, page: number = 1) {
   try {
-    const res = await fetch(
-      `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${page}`
-    );
+    const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${page}`);
     if (res.ok) {
       const data = await res.json();
-      if (data.data && data.data.length > 0) {
+      if (data?.data?.length > 0) {
         const results: AnimeCard[] = data.data.map((anime: any) => ({
           id: String(anime.mal_id),
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.image_url || POSTER_FALLBACK,
         }));
-        return {
-          results,
-          hasNextPage: Boolean(data.pagination?.has_next_page),
-        };
+        return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
     }
   } catch (err) {
-    console.error("Fetch search fallback activated:", err);
+    console.error("fetchSearch error:", err);
   }
-
-  const filtered = DEFAULT_ANIME_LIST.filter((item) =>
-    item.title.toLowerCase().includes(query.toLowerCase())
-  );
-
-  return {
-    results: filtered.length > 0 ? filtered : DEFAULT_ANIME_LIST,
-    hasNextPage: false,
-  };
+  return { results: FALLBACK_CATALOG, hasNextPage: false };
 }
 
 export function getWatchHistory(): WatchEntry[] {
