@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, ExternalLink, RefreshCw } from "lucide-react";
+import { X, Server, RefreshCw } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -23,13 +23,31 @@ export function PlayerModal({
   onClose,
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
+  const [serverIdx, setServerIdx] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
 
   const cleanSlug = toSlug(anime.title);
-  
-  // Working Direct Play + Fallback Direct AnimeDekho Link
-  const gogoStreamUrl = `https://anitaku.pe/${cleanSlug}-episode-${episode}`;
-  const embedUrl = `https://vidsrc.me/embed/anime?id=${anime.malId || anime.id}&s=1&e=${episode}`;
+  const animeId = anime.malId || anime.id || "21";
+
+  // VidSrc CC & Working Embed Templates from EmbedIn Repository
+  const SERVERS = [
+    {
+      name: "VidSrc CC (Anime)",
+      url: `https://vidsrc.cc/v2/embed/anime/${animeId}/${episode}?poster=true&autoPlay=true`,
+    },
+    {
+      name: "VidSrc Pro",
+      url: `https://vidsrc.pro/embed/anime/${cleanSlug}/${episode}`,
+    },
+    {
+      name: "VidSrc XYZ",
+      url: `https://vidsrc.xyz/embed/anime/${animeId}/${episode}`,
+    },
+    {
+      name: "2Embed Player",
+      url: `https://www.2embed.cc/embedanime/${animeId}?ep=${episode}`,
+    },
+  ];
 
   useEffect(() => {
     try {
@@ -51,6 +69,8 @@ export function PlayerModal({
       console.error(e);
     }
   }, [anime, episode]);
+
+  const activeUrl = SERVERS[serverIdx]?.url || SERVERS[0].url;
 
   return (
     <div
@@ -78,33 +98,43 @@ export function PlayerModal({
         {/* Video Player */}
         <div className="relative flex-1 bg-black">
           <iframe
-            key={`${episode}-${reloadKey}`}
-            src={embedUrl}
+            key={`${serverIdx}-${episode}-${reloadKey}`}
+            src={activeUrl}
             className="h-full w-full border-0"
-            allow="autoplay; encrypted-media; fullscreen"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
             title={anime.title}
           />
         </div>
 
-        {/* Player Controls */}
+        {/* Controls */}
         <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
-          <div className="flex items-center justify-between text-xs">
-            <a
-              href={gogoStreamUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 rounded-full bg-brand/20 text-brand px-3 py-1 font-semibold hover:bg-brand/30 transition-colors"
-            >
-              <ExternalLink className="size-3.5" /> Direct Player / Server
-            </a>
-
+          {/* Server Selector */}
+          <div className="flex items-center gap-2 overflow-x-auto text-xs">
+            <span className="flex items-center gap-1 font-semibold text-muted shrink-0">
+              <Server className="size-3.5" /> Server:
+            </span>
+            {SERVERS.map((srv, idx) => (
+              <button
+                key={srv.name}
+                type="button"
+                onClick={() => setServerIdx(idx)}
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                  serverIdx === idx
+                    ? "bg-brand text-brand-fg font-bold"
+                    : "bg-surface text-muted hover:text-fg"
+                }`}
+              >
+                {srv.name}
+              </button>
+            ))}
             <button
               type="button"
               onClick={() => setReloadKey((k) => k + 1)}
-              className="flex items-center gap-1 text-muted hover:text-fg transition-colors"
+              className="ml-auto shrink-0 p-1 text-muted hover:text-fg transition-colors"
+              title="Reload Video"
             >
-              <RefreshCw className="size-3.5" /> Reload
+              <RefreshCw className="size-3.5" />
             </button>
           </div>
 
