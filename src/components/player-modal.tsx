@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Server } from "lucide-react";
+import { X, Server, RefreshCw } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -9,41 +9,14 @@ interface PlayerModalProps {
   onListChange?: () => void;
 }
 
-// Convert title into clean URL slug (e.g., "Re:ZERO -Starting Life..." -> "re-zero-starting-life-in-another-world")
-function formatSlug(title: string): string {
-  return title
+// Convert anime title to clean gogoanime slug
+function toSlug(text: string): string {
+  return text
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
 }
-
-const SERVERS = [
-  {
-    id: "vidsrc-embed",
-    name: "Server 1 (VidSrc ID)",
-    getUrl: (anime: AnimeCard, ep: number) =>
-      `https://vidsrc.cc/v2/embed/anime/${anime.malId || anime.id}/${ep}`,
-  },
-  {
-    id: "gogo-slug",
-    name: "Server 2 (Auto Slug)",
-    getUrl: (anime: AnimeCard, ep: number) =>
-      `https://em.vidsrc.pro/embed/anime/${formatSlug(anime.title)}/${ep}`,
-  },
-  {
-    id: "smashy-id",
-    name: "Server 3 (Smashy)",
-    getUrl: (anime: AnimeCard, ep: number) =>
-      `https://player.smashy.stream/anime/${anime.malId || anime.id}?ep=${ep}`,
-  },
-  {
-    id: "2embed-id",
-    name: "Server 4 (Backup)",
-    getUrl: (anime: AnimeCard, ep: number) =>
-      `https://www.2embed.cc/embedanime/${anime.malId || anime.id}?ep=${ep}`,
-  },
-];
 
 export function PlayerModal({
   anime,
@@ -51,7 +24,31 @@ export function PlayerModal({
   onClose,
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
-  const [activeServer, setActiveServer] = useState(SERVERS[0]);
+  const [serverIdx, setServerIdx] = useState(0);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const cleanSlug = toSlug(anime.title);
+  const malId = anime.malId || anime.id || "21";
+
+  // Servers configured with exact working endpoints
+  const SERVERS = [
+    {
+      name: "Server 1 (Gogoanime Direct)",
+      url: `https://gogoanimehd.io/download?id=${cleanSlug}-episode-${episode}`,
+    },
+    {
+      name: "Server 2 (VidSrc Stream)",
+      url: `https://vidsrc.cc/v2/embed/anime/${malId}/${episode}`,
+    },
+    {
+      name: "Server 3 (AnimePlay)",
+      url: `https://player.smashy.stream/anime/${malId}?ep=${episode}`,
+    },
+    {
+      name: "Server 4 (Backup Embed)",
+      url: `https://2embed.org/embed/anime/${malId}/${episode}`,
+    },
+  ];
 
   useEffect(() => {
     try {
@@ -70,9 +67,11 @@ export function PlayerModal({
       ];
       localStorage.setItem("anitoon_history", JSON.stringify(updated));
     } catch (e) {
-      console.error(e);
+      console.error("Watch history error:", e);
     }
   }, [anime, episode]);
+
+  const activeUrl = SERVERS[serverIdx]?.url || SERVERS[0].url;
 
   return (
     <div
@@ -97,11 +96,11 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Video Player Frame */}
+        {/* Video Frame */}
         <div className="relative flex-1 bg-black">
           <iframe
-            key={`${activeServer.id}-${episode}`}
-            src={activeServer.getUrl(anime, episode)}
+            key={`${serverIdx}-${episode}-${reloadKey}`}
+            src={activeUrl}
             className="h-full w-full border-0"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
@@ -109,20 +108,20 @@ export function PlayerModal({
           />
         </div>
 
-        {/* Server Selection & Episode Controls */}
+        {/* Controls */}
         <div className="flex flex-col gap-2.5 border-t border-border/60 p-3 bg-surface-2">
-          {/* Server Selector */}
+          {/* Server Switcher */}
           <div className="flex items-center gap-2 overflow-x-auto text-xs">
             <span className="flex items-center gap-1 font-semibold text-muted shrink-0">
               <Server className="size-3.5" /> Server:
             </span>
-            {SERVERS.map((srv) => (
+            {SERVERS.map((srv, idx) => (
               <button
-                key={srv.id}
+                key={srv.name}
                 type="button"
-                onClick={() => setActiveServer(srv)}
+                onClick={() => setServerIdx(idx)}
                 className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                  activeServer.id === srv.id
+                  serverIdx === idx
                     ? "bg-brand text-brand-fg font-bold"
                     : "bg-surface text-muted hover:text-fg"
                 }`}
@@ -130,9 +129,17 @@ export function PlayerModal({
                 {srv.name}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setReloadKey((k) => k + 1)}
+              className="ml-auto shrink-0 p-1 text-muted hover:text-fg"
+              title="Refresh Stream"
+            >
+              <RefreshCw className="size-3.5" />
+            </button>
           </div>
 
-          {/* Episode Controls */}
+          {/* Episode Buttons */}
           <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
             <span className="font-medium text-muted">Episode:</span>
             <div className="flex items-center gap-2">
