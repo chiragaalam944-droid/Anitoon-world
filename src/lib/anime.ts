@@ -31,8 +31,6 @@ export const CATEGORIES = [
 export const POSTER_FALLBACK =
   "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80";
 
-const HINDI_ANIME_IDS = [21, 52034, 38000, 40748, 20, 16498, 5114];
-
 const FALLBACK_CATALOG: AnimeCard[] = [
   {
     id: "52034",
@@ -62,6 +60,20 @@ const FALLBACK_CATALOG: AnimeCard[] = [
     image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
     isHindi: true,
   },
+  {
+    id: "20",
+    malId: 20,
+    title: "Naruto",
+    image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg",
+    isHindi: true,
+  },
+  {
+    id: "16498",
+    malId: 16498,
+    title: "Attack on Titan",
+    image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
+    isHindi: true,
+  },
 ];
 
 const SERVER_NAME_MAP: Record<string, string> = {
@@ -82,18 +94,13 @@ export async function fetchCatalog(kind?: string, genre?: string, page: number =
     if (res.ok) {
       const data = await res.json();
       if (data?.data?.length > 0) {
-        let results: AnimeCard[] = data.data.map((anime: any) => ({
+        const results: AnimeCard[] = data.data.map((anime: any) => ({
           id: String(anime.mal_id),
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || POSTER_FALLBACK,
-          isHindi: HINDI_ANIME_IDS.includes(anime.mal_id),
+          isHindi: true,
         }));
-
-        if (genre === "hindi-dubbed" || kind === "hindi-dubbed") {
-          const hindiFiltered = results.filter((item) => item.isHindi);
-          results = hindiFiltered.length > 0 ? hindiFiltered : FALLBACK_CATALOG;
-        }
 
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
@@ -115,7 +122,7 @@ export async function fetchSearch(query: string, page: number = 1) {
           malId: anime.mal_id,
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.image_url || POSTER_FALLBACK,
-          isHindi: HINDI_ANIME_IDS.includes(anime.mal_id),
+          isHindi: true,
         }));
         return { results, hasNextPage: Boolean(data.pagination?.has_next_page) };
       }
