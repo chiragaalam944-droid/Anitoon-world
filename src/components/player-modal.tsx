@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Play, ExternalLink, Film, RefreshCw, Server } from "lucide-react";
+import { X, Play, ExternalLink, Film, Server } from "lucide-react";
 import { type AnimeCard, getWatchHistory } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -17,24 +17,30 @@ export function PlayerModal({
   const [episode, setEpisode] = useState(startEpisode);
   const [serverIdx, setServerIdx] = useState(0);
 
-  const malId = anime.malId || anime.id || "21";
+  // Fallback ID mapping for cases where malId is missing
+  const cleanId = anime.malId || anime.id || "21";
 
-  // Active High-Availability Mirrors
+  // Universal Embed Endpoints with strict anime mapping
   const SERVERS = [
     {
       name: "VidSrc Pro",
-      desc: "Fast Multi-Quality Player (MAL Route)",
-      url: `https://vidsrc.pro/embed/anime/${malId}/${episode}`,
+      desc: "Direct MAL Stream Route",
+      url: `https://vidsrc.pro/embed/anime/${cleanId}/${episode}`,
     },
     {
-      name: "2Embed Stream",
-      desc: "High-Speed Backup Stream Provider",
-      url: `https://www.2embed.cc/embedanime/${malId}/${episode}`,
+      name: "AutoEmbed Anime",
+      desc: "Multi-Source Auto Fallback",
+      url: `https://player.autoembed.cc/embed/anime/${cleanId}/${episode}`,
     },
     {
-      name: "AutoEmbed",
-      desc: "Auto-Fallback Mirror",
-      url: `https://player.autoembed.cc/embed/anime/${malId}/${episode}`,
+      name: "2Embed",
+      desc: "Backup Embed Endpoint",
+      url: `https://www.2embed.cc/embedanime/${cleanId}/${episode}`,
+    },
+    {
+      name: "Animetv Stream",
+      desc: "Direct Catalog Mirror",
+      url: `https://anime.vidsrc.vip/embed/anime/${cleanId}/${episode}`,
     },
   ];
 
@@ -110,7 +116,7 @@ export function PlayerModal({
           {/* Server Switcher */}
           <div className="w-full pt-4 border-t border-border/40">
             <p className="text-xs font-medium text-muted mb-2 flex items-center justify-center gap-1">
-              <Server className="size-3.5" /> Switch Mirror Server:
+              <Server className="size-3.5" /> Select Mirror Server:
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {SERVERS.map((srv, idx) => (
@@ -133,7 +139,7 @@ export function PlayerModal({
 
         {/* Episode Navigation */}
         <div className="flex items-center justify-between text-xs px-4 py-3 border-t border-border/60 bg-surface-2">
-          <span className="font-medium text-muted">Navigation:</span>
+          <span className="font-medium text-muted">Episode Navigation:</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
