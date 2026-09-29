@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { X, Film, AlertCircle, RefreshCw, ExternalLink, Play } from "lucide-react";
-import Hls from "hls.js";
-import { type AnimeCard, getWatchHistory } from "@/lib/anime";
+import { useState } from "react";
+import { X, Film, Server } from "lucide-react";
+import { type AnimeCard } from "@/lib/anime";
 
 interface PlayerModalProps {
   anime: AnimeCard;
   startEpisode?: number;
   onClose: () => void;
-  onListChange?: () => void;
 }
 
 export function PlayerModal({
@@ -16,105 +14,18 @@ export function PlayerModal({
   onClose,
 }: PlayerModalProps) {
   const [episode, setEpisode] = useState(startEpisode);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const [selectedServer, setSelectedServer] = useState(1);
 
-  // Clean slug for Gogoanime/Consumet
-  const cleanSlug = (anime.title || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+  const animeId = anime.malId || anime.id || "11061";
 
-  const malId = anime.malId || anime.id || "11061";
-  const backupWatchUrl = `https://vidsrc.pro/embed/anime/${malId}/${episode}`;
+  // 3 Multi-Server Links (Non-blocked embeds)
+  const servers = [
+    { id: 1, name: "Server 1 (VidSrc)", url: `https://vidsrc.pro/embed/anime/${animeId}/${episode}` },
+    { id: 2, name: "Server 2 (AutoEmbed)", url: `https://player.autoembed.cc/embed/anime/${animeId}/${episode}` },
+    { id: 3, name: "Server 3 (VidBinge)", url: `https://vidbinge.dev/embed/anime/${animeId}/${episode}` },
+  ];
 
-  useEffect(() => {
-    try {
-      const history = getWatchHistory();
-      const filtered = history.filter((item) => item.id !== anime.id);
-      const updated = [
-        {
-          id: anime.id,
-          malId: anime.malId,
-          title: anime.title,
-          image: anime.image,
-          episode,
-          updatedAt: Date.now(),
-        },
-        ...filtered,
-      ];
-      localStorage.setItem("anitoon_history", JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [anime, episode]);
-
-  useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-    setError("");
-
-    async function loadStream() {
-      try {
-        const fetchId = cleanSlug || anime.id;
-        const res = await fetch(`/api/stream?id=${fetchId}&episode=${episode}`);
-        const data = await res.json();
-
-        if (!data.sources || data.sources.length === 0) {
-          throw new Error("Stream source direct play unavailable");
-        }
-
-        const m3u8Url =
-          data.sources.find((s: any) => s.isM3U8 || s.quality === "default")?.url ||
-          data.sources[0].url;
-
-        if (!isMounted) return;
-
-        const video = videoRef.current;
-        if (!video) return;
-
-        if (hlsRef.current) {
-          hlsRef.current.destroy();
-        }
-
-        if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = m3u8Url;
-          setLoading(false);
-        } else if (Hls.isSupported()) {
-          const hls = new Hls({
-            enableWorker: true,
-            maxBufferLength: 30,
-          });
-          hlsRef.current = hls;
-          hls.loadSource(m3u8Url);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            if (isMounted) setLoading(false);
-          });
-          hls.on(Hls.Events.ERROR, () => {
-            if (isMounted) setError("HLS buffering failed. Try backup server.");
-          });
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setError(err.message || "Failed to load stream");
-          setLoading(false);
-        }
-      }
-    }
-
-    loadStream();
-
-    return () => {
-      isMounted = false;
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-      }
-    };
-  }, [anime.id, cleanSlug, episode]);
+  const currentServerUrl = servers.find((s) => s.id === selectedServer)?.url || servers[0].url;
 
   return (
     <div
@@ -122,7 +33,7 @@ export function PlayerModal({
       onClick={onClose}
     >
       <div
-        className="relative flex h-[82vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-surface border border-border/60 shadow-2xl"
+        className="relative flex h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-surface border border-border/60 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -142,40 +53,38 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Video Player Box */}
-        <div className="relative flex-1 bg-black flex flex-col items-center justify-center p-4">
-          {loading && (
-            <div className="absolute flex items-center gap-2 text-xs text-muted animate-pulse">
-              <RefreshCw className="size-4 animate-spin text-brand" /> Fetching HLS Stream...
-            </div>
-          )}
+        {/* Server Selector Bar */}
+        <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border/40 overflow-x-auto text-xs">
+          <span className="flex items-center gap-1 font-medium text-muted shrink-0">
+            <Server className="size-3.5" /> Server:
+          </span>
+          {servers.map((server) => (
+            <button
+              key={server.id}
+              onClick={() => setSelectedServer(server.id)}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 transition-all ${
+                selectedServer === server.id
+                  ? "bg-brand text-brand-fg"
+                  : "bg-surface-2 text-muted hover:text-fg"
+              }`}
+            >
+              {server.name}
+            </button>
+          ))}
+        </div>
 
-          {error && (
-            <div className="flex flex-col items-center justify-center gap-3 text-center z-10 max-w-xs">
-              <div className="flex items-center gap-1.5 text-xs text-red-400 font-medium">
-                <AlertCircle className="size-4 shrink-0" /> {error}
-              </div>
-              <a
-                href={backupWatchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-5 rounded-xl bg-brand text-brand-fg font-bold text-xs flex items-center gap-2 shadow-lg hover:opacity-90 active:scale-95 transition-all"
-              >
-                <Play className="size-3.5 fill-current" /> Watch via External Server <ExternalLink className="size-3.5" />
-              </a>
-            </div>
-          )}
-
-          <video
-            ref={videoRef}
-            controls
-            playsInline
-            preload="metadata"
-            className={`h-full w-full object-contain ${error ? "hidden" : "block"}`}
+        {/* Embed Player */}
+        <div className="relative flex-1 bg-black">
+          <iframe
+            key={`${selectedServer}-${episode}`}
+            src={currentServerUrl}
+            className="h-full w-full border-0"
+            allowFullScreen
+            allow="autoplay; encrypted-media; picture-in-picture"
           />
         </div>
 
-        {/* Navigation */}
+        {/* Episode Controls */}
         <div className="flex items-center justify-between text-xs px-4 py-3 border-t border-border/60 bg-surface-2">
           <span className="font-medium text-muted">Episode Navigation:</span>
           <div className="flex items-center gap-2">
