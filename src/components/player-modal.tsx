@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Film, Server } from "lucide-react";
+import { X, Film, Server, ExternalLink } from "lucide-react";
 import { type AnimeCard } from "@/lib/anime";
 
 interface PlayerModalProps {
@@ -18,7 +18,6 @@ export function PlayerModal({
 
   const animeId = anime.malId || anime.id || "11061";
 
-  // 3 Multi-Server Links (Non-blocked embeds)
   const servers = [
     { id: 1, name: "Server 1 (VidSrc)", url: `https://vidsrc.pro/embed/anime/${animeId}/${episode}` },
     { id: 2, name: "Server 2 (AutoEmbed)", url: `https://player.autoembed.cc/embed/anime/${animeId}/${episode}` },
@@ -53,24 +52,35 @@ export function PlayerModal({
           </button>
         </div>
 
-        {/* Server Selector Bar */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border/40 overflow-x-auto text-xs">
-          <span className="flex items-center gap-1 font-medium text-muted shrink-0">
-            <Server className="size-3.5" /> Server:
-          </span>
-          {servers.map((server) => (
-            <button
-              key={server.id}
-              onClick={() => setSelectedServer(server.id)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 transition-all ${
-                selectedServer === server.id
-                  ? "bg-brand text-brand-fg"
-                  : "bg-surface-2 text-muted hover:text-fg"
-              }`}
-            >
-              {server.name}
-            </button>
-          ))}
+        {/* Server Selector Bar & Direct Launcher */}
+        <div className="flex items-center justify-between gap-2 px-4 py-2 bg-surface border-b border-border/40 overflow-x-auto text-xs">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 font-medium text-muted shrink-0">
+              <Server className="size-3.5" /> Server:
+            </span>
+            {servers.map((server) => (
+              <button
+                key={server.id}
+                onClick={() => setSelectedServer(server.id)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 transition-all ${
+                  selectedServer === server.id
+                    ? "bg-brand text-brand-fg"
+                    : "bg-surface-2 text-muted hover:text-fg"
+                }`}
+              >
+                {server.name}
+              </button>
+            ))}
+          </div>
+
+          <a
+            href={currentServerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 font-semibold shrink-0 transition-colors"
+          >
+            Open in Browser <ExternalLink className="size-3" />
+          </a>
         </div>
 
         {/* Embed Player */}
